@@ -1,0 +1,15 @@
+{
+  "name": "lingolive-platform",
+  "private": true,
+  "packageManager": "npm@11.19.1",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "npm run dev --workspace @lingolive/api & npm run dev --workspace @lingolive/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "prisma:generate": "npm run prisma:generate --workspace @lingolive/api",
+    "prisma:migrate": "npm run prisma:migrate --workspace @lingolive/api"
+  }
+}
