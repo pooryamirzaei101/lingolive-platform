@@ -1,0 +1,52 @@
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { PGlite } from "@electric-sql/pglite";
+import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
+import * as schema from "./schema";
+import { getVpsMediaStore } from "@/lib/vps-media-store";
+
+let database: any;
+
+function d1Compatible<T extends object>(value: T, ready: Promise<unknown> = Promise.resolve()): T {
+  return new Proxy(value, {
+    get(target, property) {
+      if (property === "get") return async () => { await ready; const rows = await (target as any); return rows[0]; };
+      if (property === "all") return async () => { await ready; return await (target as any); };
+      if (property === "then") {
+        return (resolve: (value: unknown) => unknown, reject: (error: unknown) => unknown) =>
+          ready.then(() => Promise.resolve(target).then(resolve, reject), reject);
+      }
+      const member = Reflect.get(target, property, target);
+      if (typeof member === "function") {
+        return (...args: unknown[]) => {
+          const result = member.apply(target, args);
+          return result && typeof result === "object" ? d1Compatible(result, ready) : result;
+        };
+      }
+      return member;
+    },
+  });
+}
+
+export function getDb(): any {
+  if (database) return database;
+  const connectionString = process.env.DATABASE_URL?.trim();
+  if (!connectionString && process.env.LOCAL_ADMIN_MODE === "true") {
+    const client = new PGlite("file://local-data/pglite");
+    database = d1Compatible(drizzlePglite(client, { schema }), client.waitReady);
+    return database;
+  }
+  if (!connectionString) throw new Error("DATABASE_URL is not configured.");
+  const client = postgres(connectionString, {
+    max: Number(process.env.DATABASE_POOL_SIZE || 8),
+    idle_timeout: 20,
+    connect_timeout: 15,
+    ssl: process.env.DATABASE_SSL === "false" ? false : "require",
+  });
+  database = d1Compatible(drizzle(client, { schema }));
+  return database;
+}
+
+export function getMediaBucket() {
+  return getVpsMediaStore();
+}

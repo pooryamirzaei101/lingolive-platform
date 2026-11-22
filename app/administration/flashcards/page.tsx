@@ -1,0 +1,7 @@
+import {isAdmin} from "@/lib/admin";
+import {listFlashcards} from "@/lib/flashcards";
+import {FlashcardCreate,FlashcardEditor} from "@/components/flashcard-admin";
+import {CategoryManager} from "@/components/video-admin";
+import {getVideoCategories} from "@/lib/video-categories";
+export const dynamic="force-dynamic";
+export default async function FlashcardsAdmin(){if(!await isAdmin())return <section className="section shell"><h1>Administrator access required</h1></section>;try{const [cards,categories]=await Promise.all([listFlashcards(true),getVideoCategories("flashcards")]);return <section className="section shell admin-page"><a className="folder-back" href="/administration">← Administration</a><span className="section-eyebrow">ADMINISTRATION · FLASHCARDS</span><h1>Flashcards studio</h1><p>Create folders and subfolders first. Inside a folder, add a word, phrase, or phrasal verb with its example, explanation, and optional recorded voice.</p><CategoryManager categories={categories} section="flashcards"/><div className="detail-grid"><div className="detail-panel"><h2>Flashcard library</h2>{cards.length?cards.map(card=><FlashcardEditor key={card.id} card={card} categories={categories}/>):<p>No flashcards yet.</p>}</div><aside className="detail-panel" id="add-content"><h2>Add flashcard</h2><FlashcardCreate categories={categories}/></aside></div></section>}catch{return <section className="section shell"><h1>Flashcards studio</h1><p className="notice">The flashcard database is temporarily unavailable.</p></section>}}

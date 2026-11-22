@@ -1,0 +1,2 @@
+export type FlashcardAudioMeta={phraseMime:string;exampleAudioKey:string;exampleMime:string;explanationAudioKey:string;explanationMime:string};
+export function flashcardAudioMeta(raw:string|null|undefined):FlashcardAudioMeta{const fallback={phraseMime:raw||"audio/mpeg",exampleAudioKey:"",exampleMime:"audio/mpeg",explanationAudioKey:"",explanationMime:"audio/mpeg"};if(!raw?.trim().startsWith("{"))return fallback;try{return {...fallback,...JSON.parse(raw)}}catch{return fallback}}

@@ -1,0 +1,2 @@
+import {verifyZibalOrder} from '@/lib/payments';
+export async function GET(request:Request){const url=new URL(request.url),success=url.searchParams.get('success'),status=url.searchParams.get('status');if(success==='0'||status==='0')return Response.redirect(`${url.origin}/premium?payment=canceled`,303);try{await verifyZibalOrder(url.searchParams.get('order')||'',url.searchParams.get('trackId')||'');return Response.redirect(`${url.origin}/premium?payment=success`,303)}catch{return Response.redirect(`${url.origin}/premium?payment=unverified`,303)}}

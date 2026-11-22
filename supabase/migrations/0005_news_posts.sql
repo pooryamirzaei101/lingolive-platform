@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS "news_posts" ("id" text PRIMARY KEY NOT NULL,"title" text NOT NULL,"description" text DEFAULT '' NOT NULL,"body" text DEFAULT '' NOT NULL,"cover_image_url" text DEFAULT '' NOT NULL,"linked_content_id" text DEFAULT '' NOT NULL,"status" text DEFAULT 'draft' NOT NULL,"published_at" bigint,"created_by" text NOT NULL,"created_at" bigint NOT NULL,"updated_at" bigint NOT NULL);
+--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "idx_news_posts_status_published" ON "news_posts" ("status","published_at");

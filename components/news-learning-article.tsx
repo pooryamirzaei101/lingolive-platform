@@ -1,0 +1,11 @@
+"use client";
+import {useEffect,useState} from "react";
+import {InteractiveEnglish} from "@/components/interactive-english";
+import {translationLanguages,type TranslationLanguage} from "@/lib/languages";
+export function NewsLearningArticle({description,body}:{description:string;body:string}){
+ const [language,setLanguage]=useState<TranslationLanguage>("fa"),[message,setMessage]=useState(""),[busy,setBusy]=useState(false);
+ useEffect(()=>{fetch('/api/preferences/translation-language',{cache:'no-store'}).then(r=>r.json()).then(data=>{if(data.language)setLanguage(data.language)}).catch(()=>{})},[]);
+ async function choose(next:TranslationLanguage){setLanguage(next);setBusy(true);setMessage('');try{const response=await fetch('/api/preferences/translation-language',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({language:next})}),data=await response.json();if(!response.ok)throw Error(data.error||'Could not save language.');setMessage(`Word and phrase translations will use ${translationLanguages[next]}.`)}catch(error){setMessage(error instanceof Error?error.message:'Could not save language.')}finally{setBusy(false)}}
+ const paragraphs=body.split(/\n\s*\n/).map(value=>value.trim()).filter(Boolean);
+ return <><div className="article-language-card"><div><strong>Choose your translation language</strong><p>Tap any word or select a short phrase after choosing.</p></div><label>Translation language<select value={language} disabled={busy} onChange={event=>choose(event.target.value as TranslationLanguage)}>{Object.entries(translationLanguages).map(([code,name])=><option key={code} value={code}>{name}</option>)}</select></label>{message&&<p role="status">{message}</p>}</div><p className="news-description"><InteractiveEnglish key={`description-${language}`} text={description} tapForMeaning/></p><div className="news-body">{paragraphs.map((paragraph,index)=><p key={`${language}-${index}`}><InteractiveEnglish text={paragraph} tapForMeaning phraseAction/></p>)}</div><p className="reader-tip">Tap any English word or use <strong>Translate full phrase</strong>, then choose <strong>Save to Word Bank</strong>.</p></>;
+}

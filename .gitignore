@@ -1,9 +1,17 @@
-node_modules
-.next
-dist
-coverage
-.env
-.env.*
+node_modules/
+dist/
+.next/
+.vinext/
+.wrangler/
+.sites-runtime/
+*.log
+.env*
 !.env.example
-npm-debug.log*
-*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+local-data/
+_current-codex-build-backup.zip
+# Generated packages and local artifacts
+build/
+*.zip
+System.Management.Automation.Internal.Host.InternalHost
