@@ -31,7 +31,7 @@ function d1Compatible<T extends object>(value: T, ready: Promise<unknown> = Prom
 export function getDb(): any {
   if (database) return database;
   const connectionString = process.env.DATABASE_URL?.trim();
-  if (!connectionString && process.env.LOCAL_ADMIN_MODE === "true") {
+  if (!connectionString && (process.env.LOCAL_DATABASE_MODE === "true" || process.env.LOCAL_ADMIN_MODE === "true")) {
     const client = new PGlite("file://local-data/pglite");
     database = d1Compatible(drizzlePglite(client, { schema }), client.waitReady);
     return database;

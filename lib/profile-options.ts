@@ -4,7 +4,7 @@ const countryCodes='AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE 
 const regionNames=new Intl.DisplayNames(['en'],{type:'region'});
 const canonicalRegionNames:Record<string,string>={FK:'Falkland Islands'};
 export const countries=Object.fromEntries(countryCodes.map(code=>[code,canonicalRegionNames[code]||regionNames.of(code)||code])) as Record<string,string>;
-export const sortedCountries=Object.entries(countries).sort((a,b)=>a[1].localeCompare(b[1],'en'));
+export const sortedCountries=Object.entries(countries).sort((a,b)=>a[1]<b[1]?-1:a[1]>b[1]?1:a[0].localeCompare(b[0]));
 export function countryName(code:string){return countries[code]||'Not provided'}
 export function validProfile(body:any){return body&&typeof body==='object'&&typeof body.country==='string'&&Object.hasOwn(countries,body.country)&&typeof body.level==='string'&&Object.hasOwn(learnerLevels,body.level)&&typeof body.purpose==='string'&&Object.hasOwn(learningPurposes,body.purpose)&&typeof body.newsletterConsent==='boolean'}
 export function safeCsvCell(value:unknown){const text=String(value??'');return '"'+(/^[\s]*[=+\-@\t\r]/.test(text)?"'"+text:text).replaceAll('"','""')+'"'}
