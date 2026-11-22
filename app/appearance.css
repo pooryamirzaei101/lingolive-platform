@@ -172,3 +172,24 @@ body { background: linear-gradient(180deg, #f8fbff 0, #f7faff 55%, #ffffff 100%)
 @media (prefers-reduced-motion: no-preference) {
   .button, :is(.course-card, .lesson-card, .video-folder-card, .routine-card, .admin-studio-card) { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease; }
 }
+/* Page translation popup */
+.page-translator { position: fixed; right: 24px; bottom: 24px; z-index: 90; }
+.page-translate-trigger { display: inline-flex; align-items: center; gap: 9px; min-height: 48px; padding: 0 17px; border: 0; border-radius: 999px; color: #fff; background: #102a43; box-shadow: 0 12px 30px rgba(16,42,67,.25); font-weight: 750; cursor: pointer; }
+.page-translate-trigger:hover { background: #163f60; transform: translateY(-2px); }
+.page-translate-panel { width: min(390px, calc(100vw - 32px)); max-height: min(680px, calc(100vh - 32px)); overflow: auto; padding: 22px; border: 1px solid #cfdfed; border-radius: 20px; background: #fff; box-shadow: 0 22px 65px rgba(16,42,67,.22); }
+.page-translate-panel header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.page-translate-panel h2 { margin: 3px 0 0; font-size: 1.35rem; }
+.page-translate-panel > p { color: var(--muted-foreground); }
+.page-translate-panel label { display: grid; gap: 7px; margin: 16px 0; color: #294a68; font-weight: 700; }
+.page-translate-panel select { min-height: 46px; padding: 0 12px; border: 1px solid var(--input); border-radius: 11px; background: #fff; color: var(--foreground); }
+.page-translate-panel > .button { width: 100%; }
+.page-translate-close { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 12px; background: #f7faff; color: #294a68; cursor: pointer; }
+.page-translation-result { margin-top: 18px; padding: 17px; border: 1px solid #cfe0ef; border-radius: 14px; background: #f2f8ff; }
+.page-translation-result strong { color: #d62f68; }
+.page-translation-result p { margin: 9px 0 0; white-space: pre-wrap; color: #173551; line-height: 1.8; }
+@media (max-width: 600px) {
+ .page-translator { right: 16px; bottom: 16px; }
+ .page-translate-trigger span { display: none; }
+ .page-translate-trigger { width: 50px; padding: 0; justify-content: center; }
+ .page-translate-panel { max-height: calc(100vh - 32px); }
+}

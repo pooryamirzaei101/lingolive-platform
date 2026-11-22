@@ -9,6 +9,7 @@ import { AppearancePreference } from "@/components/appearance-preference";
 import {LearnerOnboardingGate} from "@/components/learner-onboarding-gate";
 import {LearningActivityTracker} from "@/components/learning-activity-tracker";
 import {PwaManager} from "@/components/pwa-manager";
+import {PageTranslator} from "@/components/page-translator";
 import {getChatGPTUser} from "@/app/chatgpt-auth";
 import { Header, Footer } from "@/components/chrome";
 
@@ -50,7 +51,7 @@ export default async function RootLayout({
   const vpsNavigationFallback=process.env.VPS_BUILD==="1";
   return (
     <html lang="en">
-      <body className="antialiased">{vpsNavigationFallback&&<script dangerouslySetInnerHTML={{__html:`document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null;if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==="_blank"||a.hasAttribute("download"))return;var u=new URL(a.href,location.href);if(u.origin!==location.origin||u.pathname===location.pathname&&u.search===location.search&&u.hash)return;e.preventDefault();e.stopImmediatePropagation();location.assign(u.href)},true);`}}/>}<AppearancePreference/><PwaManager/><div className="app-layout"><Header/><div className="app-main"><main><LearnerOnboardingGate>{children}</LearnerOnboardingGate><LearningActivityTracker signedIn={signedIn}/></main><Footer/></div></div></body>
+      <body className="antialiased">{vpsNavigationFallback&&<script dangerouslySetInnerHTML={{__html:`document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null;if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target==="_blank"||a.hasAttribute("download"))return;var u=new URL(a.href,location.href);if(u.origin!==location.origin||u.pathname===location.pathname&&u.search===location.search&&u.hash)return;e.preventDefault();e.stopImmediatePropagation();location.assign(u.href)},true);`}}/>}<AppearancePreference/><PwaManager/><PageTranslator/><div className="app-layout"><Header/><div className="app-main"><main><LearnerOnboardingGate>{children}</LearnerOnboardingGate><LearningActivityTracker signedIn={signedIn}/></main><Footer/></div></div></body>
     </html>
   );
 }
