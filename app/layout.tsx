@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/inter/wght.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
 import "@fontsource-variable/vazirmatn/wght.css";
 import "./globals.css";
 import "./appearance.css";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   title: "LingoLive — Learn English your way",
   description: "Practical English courses, lessons, stories, and speaking practice for every level.",
   manifest: "/manifest.webmanifest",
-  themeColor: "#f35f86",
+  themeColor: "#102a43",
   openGraph: {
     title: "LingoLive",
     description: "Make English part of your day.",
