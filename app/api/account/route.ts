@@ -5,10 +5,11 @@ import {learnerPreferences,learnerProfiles} from '@/db/schema';
 import {isTranslationLanguage} from '@/lib/languages';
 import {validProfile} from '@/lib/profile-options';
 import {syncLearnerProfile} from '@/lib/learner-profiles';
+import {sameRequestOrigin} from '@/lib/request-origin';
 import {confirmSignup} from '@/lib/referrals';
 export async function POST(request:Request){
  const user=await getChatGPTUser();if(!user)return Response.json({error:'Sign in before creating a learner profile.'},{status:401});
- if(request.headers.get('origin')!==new URL(request.url).origin)return Response.json({error:'Invalid request origin.'},{status:403});
+ if(!sameRequestOrigin(request))return Response.json({error:'Invalid request origin.'},{status:403});
  try{const body=await request.json() as any;if(!isTranslationLanguage(body?.translationLanguage))return Response.json({error:'Choose a translation language.'},{status:400});
  const full=body.mode==='profile'||['country','level','purpose','newsletterConsent'].some(field=>Object.hasOwn(body,field));
  if(full&&!validProfile(body))return Response.json({error:'Choose your country, English level, and learning purpose, and set your newsletter preference.'},{status:400});
