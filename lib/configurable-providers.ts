@@ -12,14 +12,24 @@ function publicAddress(address:string){
  const [a,b]=address.split('.').map(Number);
  return isIP(address)===4&&a!==0&&a!==10&&a!==127&&a<224&&!(a===100&&b>=64&&b<=127)&&!(a===169&&b===254)&&!(a===172&&b>=16&&b<=31)&&!(a===192&&[0,168].includes(b))&&!(a===198&&[18,19,51].includes(b))&&!(a===203&&b===0);
 }
-async function providerFetch(connection:ProviderConnection,init:RequestInit){
+async function providerFetch(connection:ProviderConnection,init:RequestInit,providerName='configured API'){
  const url=providerUrl(connection.endpoint),addresses=await lookup(url.hostname,{all:true});
  if(!addresses.length||addresses.some(a=>!publicAddress(a.address)))throw Error('API endpoints must resolve to public internet addresses.');
  if(!connection.key)throw Error('Save this provider’s API key first.');
  const headers=new Headers(init.headers);headers.set(connection.authHeader,connection.authHeader==='Authorization'?`Bearer ${connection.key}`:connection.key);
  let response:Response;
  try{response=await fetch(url,{...init,headers,redirect:'error',signal:AbortSignal.timeout(120000)})}catch{throw Error('The configured API could not connect or timed out. Check its endpoint and try again.')}
- if(!response.ok)throw Error(`The configured API returned ${response.status}. Check its key, model, format, and account limits.`);
+ if(!response.ok){
+  const label=providerName==='Langbly'?'Langbly':'The configured API';
+  const reason=response.status===401||response.status===403
+   ? `${label} rejected the saved API key or account access. Re-copy the key from the provider dashboard without quotes or a Bearer prefix.`
+   : response.status===402||response.status===456
+    ? `${label} requires an active account, payment method, or available quota.`
+    : response.status===429
+     ? `${label} rate or usage limit was reached. Wait briefly and check account usage.`
+     : `${label} returned ${response.status}. Check the endpoint, account status, and request format.`;
+  throw Error(reason);
+ }
  if(!response.body)throw Error('The configured API returned no result.');
  const reader=response.body.getReader(),chunks:Uint8Array[]=[];let size=0;
  try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>10_000_000){await reader.cancel();throw Error('API result exceeds 10 MB.')}chunks.push(value)}}finally{reader.releaseLock()}
@@ -38,7 +48,7 @@ export async function configurableTranscription(file:{body:ReadableStream<Uint8A
 }
 export async function configurableTranslation(texts:string[],language:string,connection:ProviderConnection,protocol:'langbly'|'openai'|'custom'):Promise<string[]>{
  if(protocol==='langbly'){
-  const result=await providerFetch(connection,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:texts,source:'en',target:language,format:'text'})});
+  const result=await providerFetch(connection,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:texts,source:'en',target:language,format:'text'})},'Langbly');
   const rows=result?.data?.translations;
   if(!Array.isArray(rows)||rows.length!==texts.length||rows.some((row:{translatedText?:unknown})=>typeof row?.translatedText!=='string'||!row.translatedText.trim()))throw Error('Langbly returned an incomplete translation result.');
   return rows.map((row:{translatedText:string})=>row.translatedText.trim());
