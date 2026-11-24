@@ -1,8 +1,11 @@
-const CACHE_NAME="lingolive-shell-v91";
+const CACHE_NAME="lingolive-shell-v92";
 const SAFE_SHELL=["/offline","/manifest.webmanifest","/favicon.svg","/icons/icon-192.png","/icons/icon-512.png","/icons/maskable-512.png","/icons/apple-touch-icon.png"];
 
 self.addEventListener("install",event=>{
-  event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(SAFE_SHELL)));
+  event.waitUntil(Promise.all([
+    caches.open(CACHE_NAME).then(cache=>cache.addAll(SAFE_SHELL)),
+    self.skipWaiting()
+  ]));
 });
 
 self.addEventListener("activate",event=>{
@@ -25,7 +28,15 @@ self.addEventListener("fetch",event=>{
     event.respondWith(fetch(request).catch(()=>caches.match("/offline")));
     return;
   }
-  const staticAsset=url.pathname.startsWith("/assets/")||/\.(?:css|js|woff2?|png|svg|webp|ico)$/.test(url.pathname);
+  const codeAsset=/\.(?:css|js)$/.test(url.pathname);
+  if(codeAsset){
+    event.respondWith(fetch(request).then(response=>{
+      if(response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy))}
+      return response;
+    }).catch(()=>caches.match(request)));
+    return;
+  }
+  const staticAsset=url.pathname.startsWith("/assets/")||/\.(?:woff2?|png|svg|webp|ico)$/.test(url.pathname);
   if(staticAsset){
     event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{
       if(response.ok){const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(request,copy))}
