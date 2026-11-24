@@ -23,9 +23,15 @@ export function PwaManager(){
     window.addEventListener("beforeinstallprompt",offerInstall);
     if("serviceWorker" in navigator){
       if(process.env.NODE_ENV!=="production"){
-        navigator.serviceWorker.getRegistrations()
-          .then(registrations=>Promise.all(registrations.map(registration=>registration.unregister())))
-          .catch(()=>{});
+        Promise.all([
+          navigator.serviceWorker.getRegistrations().then(registrations=>Promise.all(registrations.map(registration=>registration.unregister()))),
+          "caches" in window?caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("lingolive-")).map(key=>caches.delete(key)))):Promise.resolve([])
+        ]).then(()=>{
+          const marker="lingolive-dev-service-worker-cleaned";
+          if(navigator.serviceWorker.controller&&sessionStorage.getItem(marker)!=="1"){
+            sessionStorage.setItem(marker,"1");window.location.reload();
+          }else sessionStorage.removeItem(marker);
+        }).catch(()=>{});
         return()=>{
           window.removeEventListener("online",online);
           window.removeEventListener("offline",offlineNow);

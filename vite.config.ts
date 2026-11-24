@@ -35,6 +35,7 @@ export default defineConfig(async () => {
         : [],
       dedupe: ["react", "react-dom"],
     },
+    optimizeDeps: { exclude: ["lucide-react"] },
     server: { host: "0.0.0.0" },
   };
 });
