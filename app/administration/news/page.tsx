@@ -10,9 +10,9 @@ export default async function Page(){
   if(!await isAdmin())return <section className="section shell"><h1>Administrator access required</h1></section>;
   const db=getDb();
   const [posts,allVideos,categories]=await Promise.all([
-    db.select().from(newsPosts).orderBy(desc(newsPosts.updatedAt)).all(),
-    db.select().from(videoLessons).where(eq(videoLessons.contentKind,"video")).orderBy(desc(videoLessons.createdAt)).all(),
-    getVideoCategories("video")
+    db.select().from(newsPosts).orderBy(desc(newsPosts.updatedAt)).all().catch(error=>{console.error("News posts query failed",error);return []}),
+    db.select().from(videoLessons).where(eq(videoLessons.contentKind,"video")).orderBy(desc(videoLessons.createdAt)).all().catch(error=>{console.error("News videos query failed",error);return []}),
+    getVideoCategories("video").catch(error=>{console.error("News categories query failed",error);return []})
   ]);
   const newsIds=new Set<string>(["news"]);let changed=true;
   while(changed){changed=false;for(const category of categories)if(category.parentId&&newsIds.has(category.parentId)&&!newsIds.has(category.id)){newsIds.add(category.id);changed=true}}
