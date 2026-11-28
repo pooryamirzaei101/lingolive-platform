@@ -15,7 +15,7 @@ import { Header, Footer } from "@/components/chrome";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://englishfluento.pooryamirzaei101.chatgpt.site"),
-  title: "42848875",
+  title: "LingoLive — Learn English your way",
   description: "Practical English courses, lessons, stories, and speaking practice for every level.",
   manifest: "/manifest.webmanifest",
   themeColor: "#102a43",
